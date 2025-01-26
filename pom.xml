@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
+        <main-game-class>com.codegym.games.racer.RacerGame</main-game-class>
     </properties>
 
     <dependencies>
@@ -69,6 +70,28 @@
                     <excludes>
                         <exclude>**/StrangeTest</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <Main-Class>
+                                org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader
+                            </Main-Class>
+                        </manifest>
+                        <manifestEntries>
+                            <Rsrc-Main-Class>${main-game-class}</Rsrc-Main-Class>
+                            <class-path>./</class-path>
+                            <key>value</key>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
