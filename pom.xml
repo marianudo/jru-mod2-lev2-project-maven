@@ -11,7 +11,13 @@
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
-        <main-game-class>com.codegym.games.racer.RacerGame</main-game-class>
+
+        <!-- Define the JavaFX main class here once -->
+        <mainClass>com.codegym.games.racer.RacerGame</mainClass>
+
+        <!-- Optional: set encoding and JavaFX version -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>18.0.1</javafx.version>
     </properties>
 
     <dependencies>
@@ -22,19 +28,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.codegym</groupId>
             <artifactId>desktop-game-engine</artifactId>
             <version>1.0</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>18.0.1</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -48,75 +51,27 @@
         <resources>
             <resource>
                 <directory>${project.build.directory}/dependencies</directory>
+                <targetPath>lib/</targetPath>
             </resource>
         </resources>
+
         <plugins>
-            <!-- Usual compilation -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>3.1.2</version>
-            </plugin>
+
+            <!-- Compile -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
-            <!-- Run java-fx app over Maven -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>${main-game-class}</mainClass>
-                    <options>
-                        <option>--add-modules</option>
-                        <option>javafx.controls,javafx.fxml</option>
-                    </options>
-
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/StrangeTest</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <Main-Class>
-                                org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader
-                            </Main-Class>
-                        </manifest>
-                        <manifestEntries>
-                            <Rsrc-Main-Class>${main-game-class}</Rsrc-Main-Class>
-                            <class-path>./</class-path>
-                            <key>value</key>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
+            <!-- Copy dependencies -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.9.0</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -130,6 +85,48 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Package into runnable JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Rsrc-Main-Class>${mainClass}</Rsrc-Main-Class>
+                            <Class-Path>./</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Run JavaFX app with Maven -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Testing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/StrangeTest*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
